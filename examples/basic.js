@@ -1,19 +1,19 @@
 /**
- * Basic ModelPilot Usage Example
+ * Basic Agentlify Usage Example
  * Demonstrates OpenAI-compatible API for intelligent model routing
  */
 
-const ModelPilot=require('../src/index');
+const Agentlify=require('../src/index');
 
 async function basicExample() {
-  // Initialize ModelPilot client (similar to OpenAI)
-  const client=new ModelPilot({
-    apiKey: process.env.MODELPILOT_API_KEY, // Get from https://modelpilot.co
+  // Initialize Agentlify client (similar to OpenAI)
+  const client=new Agentlify({
+    apiKey: process.env.AGENTLIFY_API_KEY, // Get from https://modelpilot.co
     routerId: 'my-router-id' // Required
   });
 
   try {
-    console.log('🚀 ModelPilot Basic Example\n');
+    console.log('🚀 Agentlify Basic Example\n');
 
     // Simple chat completion (OpenAI-compatible)
     console.log('1. Simple Chat Completion:');

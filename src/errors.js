@@ -1,32 +1,32 @@
 /**
- * ModelPilot Error Classes
+ * Agentlify Error Classes
  * OpenAI-compatible error handling
  */
 
 /**
- * Base ModelPilot error class
+ * Base Agentlify error class
  */
-class ModelPilotError extends Error {
-  constructor(message, options = {}) {
+class AgentlifyError extends Error {
+  constructor(message,options={}) {
     super(message);
-    this.name = 'ModelPilotError';
-    this.type = options.type || 'modelpilot_error';
-    this.code = options.code;
-    this.param = options.param;
+    this.name='AgentlifyError';
+    this.type=options.type||'modelpilot_error';
+    this.code=options.code;
+    this.param=options.param;
   }
 }
 
 /**
- * API error - for HTTP errors from the ModelPilot API
+ * API error - for HTTP errors from the Agentlify API
  */
-class APIError extends ModelPilotError {
-  constructor(message, status, response = null) {
-    super(message, { type: 'api_error' });
-    this.name = 'APIError';
-    this.status = status;
-    this.response = response;
-    this.code = response?.error?.code;
-    this.param = response?.error?.param;
+class APIError extends AgentlifyError {
+  constructor(message,status,response=null) {
+    super(message,{type: 'api_error'});
+    this.name='APIError';
+    this.status=status;
+    this.response=response;
+    this.code=response?.error?.code;
+    this.param=response?.error?.param;
   }
 }
 
@@ -35,9 +35,9 @@ class APIError extends ModelPilotError {
  */
 class AuthenticationError extends APIError {
   constructor(message) {
-    super(message, 401);
-    this.name = 'AuthenticationError';
-    this.type = 'authentication_error';
+    super(message,401);
+    this.name='AuthenticationError';
+    this.type='authentication_error';
   }
 }
 
@@ -46,9 +46,9 @@ class AuthenticationError extends APIError {
  */
 class RateLimitError extends APIError {
   constructor(message) {
-    super(message, 429);
-    this.name = 'RateLimitError';
-    this.type = 'rate_limit_exceeded';
+    super(message,429);
+    this.name='RateLimitError';
+    this.type='rate_limit_exceeded';
   }
 }
 
@@ -56,11 +56,11 @@ class RateLimitError extends APIError {
  * Invalid request error - for malformed requests
  */
 class InvalidRequestError extends APIError {
-  constructor(message, param = null) {
-    super(message, 400);
-    this.name = 'InvalidRequestError';
-    this.type = 'invalid_request_error';
-    this.param = param;
+  constructor(message,param=null) {
+    super(message,400);
+    this.name='InvalidRequestError';
+    this.type='invalid_request_error';
+    this.param=param;
   }
 }
 
@@ -69,9 +69,9 @@ class InvalidRequestError extends APIError {
  */
 class PermissionDeniedError extends APIError {
   constructor(message) {
-    super(message, 403);
-    this.name = 'PermissionDeniedError';
-    this.type = 'permission_denied';
+    super(message,403);
+    this.name='PermissionDeniedError';
+    this.type='permission_denied';
   }
 }
 
@@ -80,9 +80,9 @@ class PermissionDeniedError extends APIError {
  */
 class NotFoundError extends APIError {
   constructor(message) {
-    super(message, 404);
-    this.name = 'NotFoundError';
-    this.type = 'not_found_error';
+    super(message,404);
+    this.name='NotFoundError';
+    this.type='not_found_error';
   }
 }
 
@@ -91,9 +91,9 @@ class NotFoundError extends APIError {
  */
 class ConflictError extends APIError {
   constructor(message) {
-    super(message, 409);
-    this.name = 'ConflictError';
-    this.type = 'conflict_error';
+    super(message,409);
+    this.name='ConflictError';
+    this.type='conflict_error';
   }
 }
 
@@ -102,9 +102,9 @@ class ConflictError extends APIError {
  */
 class UnprocessableEntityError extends APIError {
   constructor(message) {
-    super(message, 422);
-    this.name = 'UnprocessableEntityError';
-    this.type = 'unprocessable_entity';
+    super(message,422);
+    this.name='UnprocessableEntityError';
+    this.type='unprocessable_entity';
   }
 }
 
@@ -113,14 +113,14 @@ class UnprocessableEntityError extends APIError {
  */
 class InternalServerError extends APIError {
   constructor(message) {
-    super(message, 500);
-    this.name = 'InternalServerError';
-    this.type = 'internal_server_error';
+    super(message,500);
+    this.name='InternalServerError';
+    this.type='internal_server_error';
   }
 }
 
-module.exports = {
-  ModelPilotError,
+module.exports={
+  AgentlifyError,
   APIError,
   AuthenticationError,
   RateLimitError,

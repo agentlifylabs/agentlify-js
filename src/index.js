@@ -1,23 +1,24 @@
 /**
- * ModelPilot JavaScript/TypeScript Client Library
+ * Agentlify JavaScript/TypeScript Client Library
  * OpenAI-compatible interface for intelligent model routing
  */
 
 const axios=require('axios');
 const {ChatCompletions}=require('./chat');
-const {ModelPilotError,APIError,AuthenticationError,RateLimitError}=require('./errors');
+const {Agents}=require('./agents');
+const {AgentlifyError,APIError,AuthenticationError,RateLimitError}=require('./errors');
 const {validateConfig,buildHeaders,handleResponse}=require('./utils');
 
 /**
- * Main ModelPilot client class
+ * Main Agentlify client class
  * Provides OpenAI-compatible API for intelligent model routing
  */
-class ModelPilot {
+class Agentlify {
   /**
-   * Initialize ModelPilot client
+   * Initialize Agentlify client
    * @param {Object} config - Configuration options
-   * @param {string} config.apiKey - ModelPilot API key (required)
-   * @param {string} [config.baseURL] - Base URL for ModelPilot API
+   * @param {string} config.apiKey - Agentlify API key (required)
+   * @param {string} [config.baseURL] - Base URL for Agentlify API
    * @param {string} [config.routerId] - Router ID to use for requests
    * @param {number} [config.timeout] - Request timeout in milliseconds
    * @param {Object} [config.defaultHeaders] - Default headers to include
@@ -36,7 +37,7 @@ class ModelPilot {
 
     // Validate API key format
     if(!this.apiKey.startsWith('mp_')) {
-      throw new Error('Invalid ModelPilot API key format. API key must start with "mp_". Get your API key from https://modelpilot.co');
+      throw new Error('Invalid Agentlify API key format. API key must start with "mp_". Get your API key from https://modelpilot.co');
     }
 
     // Validate Router ID
@@ -46,6 +47,7 @@ class ModelPilot {
 
     // Initialize API sections
     this.chat=new ChatCompletions(this);
+    this.agents=new Agents(this);
 
     // Create axios instance with default configuration
     this.httpClient=axios.create({
@@ -71,7 +73,7 @@ class ModelPilot {
   }
 
   /**
-   * Handle HTTP errors and convert to ModelPilot errors
+   * Handle HTTP errors and convert to Agentlify errors
    * @private
    */
   // 
@@ -79,27 +81,30 @@ class ModelPilot {
     if(error.response) {
       const {status,data}=error.response;
 
+      // Extract error message from new OpenAI-compatible format or legacy format
+      const errorMessage=data?.error?.message||data?.message||'Unknown error';
+
       switch(status) {
         case 401:
-          throw new AuthenticationError(data.message||'Invalid API key');
+          throw new AuthenticationError(errorMessage);
         case 429:
-          throw new RateLimitError(data.message||'Rate limit exceeded');
+          throw new RateLimitError(errorMessage);
         case 400:
-          throw new APIError(data.message||'Bad request',status,data);
+          throw new APIError(errorMessage,status,data);
         case 422:
-          throw new APIError(data.message||'Bad request',status,data);
+          throw new APIError(errorMessage,status,data);
         default:
-          throw new APIError(data.message||'API error',status,data);
+          throw new APIError(errorMessage,status,data);
       }
     } else if(error.request) {
-      throw new ModelPilotError('Network error: No response received');
+      throw new AgentlifyError('Network error: No response received');
     } else {
-      throw new ModelPilotError(`Request error: ${error.message}`);
+      throw new AgentlifyError(`Request error: ${error.message}`);
     }
   }
 
   /**
-   * Make authenticated request to ModelPilot API
+   * Make authenticated request to Agentlify API
    * @param {string} endpoint - API endpoint
    * @param {Object} options - Request options
    * @returns {Promise<Object>} Response data
@@ -161,15 +166,22 @@ class ModelPilot {
    */
   async getModels() {
     const endpoint='/getModels';
-    return this.request(endpoint,{
+    const response=await this.request(endpoint,{
       method: 'GET'
     });
+
+    // Handle OpenAI-compatible list format
+    if(response&&response.object==='list'&&Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    return response;
   }
 }
 
-module.exports=ModelPilot;
-module.exports.ModelPilot=ModelPilot;
-module.exports.ModelPilotError=ModelPilotError;
+module.exports=Agentlify;
+module.exports.Agentlify=Agentlify;
+module.exports.AgentlifyError=AgentlifyError;
 module.exports.APIError=APIError;
 module.exports.AuthenticationError=AuthenticationError;
 module.exports.RateLimitError=RateLimitError;

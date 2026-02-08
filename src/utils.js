@@ -1,9 +1,9 @@
 /**
- * ModelPilot Utility Functions
- * Helper functions for the ModelPilot client
+ * Agentlify Utility Functions
+ * Helper functions for the Agentlify client
  */
 
-const { InvalidRequestError } = require('./errors');
+const {InvalidRequestError}=require('./errors');
 
 /**
  * Validate client configuration
@@ -12,7 +12,7 @@ const { InvalidRequestError } = require('./errors');
  */
 function validateConfig(config) {
   if(!config.apiKey) {
-    throw new Error('ModelPilot API key is required. Get one at https://modelpilot.co');
+    throw new Error('Agentlify API key is required. Get one at https://modelpilot.co');
   }
 
   if(typeof config.apiKey!=='string') {
@@ -41,9 +41,9 @@ function validateConfig(config) {
  * @returns {Object} Headers object
  */
 function buildHeaders(apiKey,additionalHeaders={}) {
-  // Ensure API key has proper format for ModelPilot
+  // Ensure API key has proper format for Agentlify
   if(!apiKey.startsWith('mp_')) {
-    throw new Error('Invalid ModelPilot API key format. API key must start with "mp_"');
+    throw new Error('Invalid Agentlify API key format. API key must start with "mp_"');
   }
 
   return {

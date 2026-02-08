@@ -1,12 +1,12 @@
 /**
- * TypeScript type definitions for ModelPilot
+ * TypeScript type definitions for Agentlify
  * OpenAI-compatible types for intelligent model routing
  */
 
-export interface ModelPilotConfig {
-  /** ModelPilot API key (required) */
+export interface AgentlifyConfig {
+  /** Agentlify API key (required) */
   apiKey: string;
-  /** Base URL for ModelPilot API */
+  /** Base URL for Agentlify API */
   baseURL?: string;
   /** Router ID to use for requests */
   routerId?: string;
@@ -67,7 +67,7 @@ export interface Tool {
 export interface ChatCompletionCreateParams {
   /** Array of message objects */
   messages: ChatMessage[];
-  /** Model to use (optional with ModelPilot routing) */
+  /** Model to use (optional with Agentlify routing) */
   model?: string;
   /** Maximum tokens to generate */
   max_tokens?: number;
@@ -137,7 +137,7 @@ export interface ChatCompletionResponse {
   choices: ChatCompletionChoice[];
   /** Token usage */
   usage: ChatCompletionUsage;
-  /** ModelPilot metadata */
+  /** Agentlify metadata */
   _meta?: {
     requestId: string;
     modelUsed: string;
@@ -207,13 +207,13 @@ export interface Model {
 }
 
 // Error types
-export class ModelPilotError extends Error {
+export class AgentlifyError extends Error {
   type: string;
   code?: string;
   param?: string;
 }
 
-export class APIError extends ModelPilotError {
+export class APIError extends AgentlifyError {
   status: number;
   response?: any;
 }
@@ -237,22 +237,131 @@ export class ChatCompletionStream {
 // Chat completions API
 export class ChatCompletions {
   create(
-    params: ChatCompletionCreateParams & { stream?: false }
+    params: ChatCompletionCreateParams & { stream?: false },
   ): Promise<ChatCompletionResponse>;
   create(
-    params: ChatCompletionCreateParams & { stream: true }
+    params: ChatCompletionCreateParams & { stream: true },
   ): Promise<ChatCompletionStream>;
   create(
-    params: ChatCompletionCreateParams
+    params: ChatCompletionCreateParams,
   ): Promise<ChatCompletionResponse | ChatCompletionStream>;
 }
 
+// Agent tool callback function type
+export type ToolCallback = (args: Record<string, any>) => Promise<any> | any;
+
+// Agent tool with optional callback
+export interface AgentTool extends Tool {
+  /**
+   * Callback function to execute the tool locally.
+   * When provided, the SDK will automatically execute this callback
+   * when the agent requests this tool, then resume execution with the result.
+   */
+  callback?: ToolCallback;
+  /** Webhook URL for server-side tool execution (agent config only) */
+  webhookUrl?: string;
+  /** Timeout for webhook calls in milliseconds */
+  timeout?: number;
+  /** Custom headers for webhook calls */
+  headers?: Record<string, string>;
+}
+
+// Agent execution parameters
+export interface AgentRunParams {
+  /** Agent ID to execute */
+  agentId: string;
+  /** Array of message objects */
+  messages: ChatMessage[];
+  /**
+   * Tool definitions with optional callbacks.
+   * When callbacks are provided, the SDK handles tool execution locally
+   * and automatically resumes the agent with results.
+   */
+  tools?: AgentTool[];
+  /** Additional options */
+  options?: Record<string, any>;
+  /** Maximum tool call iterations (default: 10) */
+  maxToolIterations?: number;
+}
+
+// Agent execution response metadata
+export interface AgentMetadata {
+  /** Agent ID */
+  agent_id: string;
+  /** Agent name */
+  agent_name: string;
+  /** Execution ID */
+  execution_id: string;
+  /** Number of steps executed */
+  steps_executed: number;
+  /** Number of skills invoked */
+  skills_invoked: number;
+  /** Total latency in milliseconds */
+  total_latency: number;
+  /** Whether tool execution is required */
+  requires_tool_execution?: boolean;
+}
+
+// Agent execution response
+export interface AgentResponse {
+  /** Unique identifier */
+  id: string;
+  /** Object type */
+  object: 'chat.completion';
+  /** Creation timestamp */
+  created: number;
+  /** Model used (agent name) */
+  model: string;
+  /** Completion choices */
+  choices: ChatCompletionChoice[];
+  /** Token usage */
+  usage: ChatCompletionUsage;
+  /** Total cost */
+  cost?: number;
+  /** Cost breakdown by step */
+  costBreakdown?: {
+    steps: Array<{
+      stepName: string;
+      modelId: string;
+      tokens: number;
+      cost: number;
+    }>;
+    total: number;
+    totalTokens: number;
+  };
+  /** Agent metadata */
+  agent_metadata: AgentMetadata;
+}
+
+// Agents API
+export class Agents {
+  /**
+   * Execute an agent with automatic tool callback handling.
+   * When tools have callbacks, the SDK:
+   * 1. Sends tools to the agent
+   * 2. Executes callbacks locally when agent requests tools
+   * 3. Automatically resumes agent with tool results
+   * 4. Continues until agent completes
+   */
+  run(params: AgentRunParams): Promise<AgentResponse>;
+
+  /**
+   * Execute an agent without automatic tool handling.
+   * Use this when you want to handle tool calls manually.
+   * Returns immediately even if tool execution is required.
+   */
+  execute(params: AgentRunParams): Promise<AgentResponse>;
+}
+
 // Main client class
-export class ModelPilot {
-  constructor(config: ModelPilotConfig);
+export class Agentlify {
+  constructor(config: AgentlifyConfig);
 
   /** Chat completions API */
   chat: ChatCompletions;
+
+  /** Agents API - execute agents with local tool callbacks */
+  agents: Agents;
 
   /** Make authenticated request */
   request(endpoint: string, options?: any): Promise<any>;
@@ -264,4 +373,4 @@ export class ModelPilot {
   getModels(): Promise<Model[]>;
 }
 
-export default ModelPilot;
+export default Agentlify;

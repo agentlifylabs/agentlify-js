@@ -1,5 +1,5 @@
 /**
- * ModelPilot Chat Completions API
+ * Agentlify Chat Completions API
  * OpenAI-compatible chat completions with intelligent model routing
  */
 
@@ -18,7 +18,7 @@ class ChatCompletions {
    * Create a chat completion
    * @param {Object} params - Chat completion parameters
    * @param {Array} params.messages - Array of message objects
-   * @param {string} [params.model] - Model to use (optional with ModelPilot routing)
+   * @param {string} [params.model] - Model to use (optional with Agentlify routing)
    * @param {number} [params.max_tokens] - Maximum tokens to generate
    * @param {number} [params.temperature] - Sampling temperature
    * @param {number} [params.top_p] - Nucleus sampling parameter
@@ -85,7 +85,7 @@ class ChatCompletions {
   _buildOptionalParams(params) {
     const optional={};
 
-    // Model selection (optional with ModelPilot)
+    // Model selection (optional with Agentlify)
     if(params.model) {
       optional.model=params.model;
     }
@@ -123,7 +123,7 @@ class ChatCompletions {
    * @private
    */
   async _createCompletion(payload) {
-    // ModelPilot router expects routerId in the URL path
+    // Agentlify router expects routerId in the URL path
     const endpoint=`/router/${this.client.routerId}`;
 
     const response=await this.client.request(endpoint,{
@@ -139,7 +139,7 @@ class ChatCompletions {
    * @private
    */
   async _createStreamingCompletion(payload) {
-    // ModelPilot router expects routerId in the URL path
+    // Agentlify router expects routerId in the URL path
     const endpoint=`/router/${this.client.routerId}`;
 
     const response=await this.client.httpClient({

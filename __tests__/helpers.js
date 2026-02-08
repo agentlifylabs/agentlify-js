@@ -1,11 +1,11 @@
 /**
- * Test utilities for ModelPilot npm package tests
+ * Test utilities for Agentlify npm package tests
  */
 
 /**
  * Create a mock axios response
  */
-function createMockResponse(data, status = 200) {
+function createMockResponse(data,status=200) {
   return {
     data,
     status,
@@ -18,12 +18,12 @@ function createMockResponse(data, status = 200) {
 /**
  * Create a mock axios error
  */
-function createMockError(message, status = 500, data = null) {
-  const error = new Error(message);
-  error.response = {
+function createMockError(message,status=500,data=null) {
+  const error=new Error(message);
+  error.response={
     status,
-    statusText: status === 401 ? 'Unauthorized' : 'Internal Server Error',
-    data: data || { error: { message } },
+    statusText: status===401? 'Unauthorized':'Internal Server Error',
+    data: data||{error: {message}},
     headers: {},
     config: {}
   };
@@ -36,8 +36,8 @@ function createMockError(message, status = 500, data = null) {
 function createMockStreamResponse(chunks) {
   return {
     data: {
-      [Symbol.asyncIterator]: async function* () {
-        for (const chunk of chunks) {
+      [Symbol.asyncIterator]: async function*() {
+        for(const chunk of chunks) {
           yield Buffer.from(chunk);
         }
       }
@@ -45,7 +45,7 @@ function createMockStreamResponse(chunks) {
   };
 }
 
-module.exports = {
+module.exports={
   createMockResponse,
   createMockError,
   createMockStreamResponse

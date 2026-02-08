@@ -1,6 +1,6 @@
 /**
- * OpenAI to ModelPilot Migration Guide
- * Side-by-side comparison showing how to migrate from OpenAI to ModelPilot
+ * OpenAI to Agentlify Migration Guide
+ * Side-by-side comparison showing how to migrate from OpenAI to Agentlify
  */
 
 // ===== BEFORE: OpenAI =====
@@ -52,50 +52,50 @@ const functionCompletion = await openai.chat.completions.create({
 });
 */
 
-// ===== AFTER: ModelPilot =====
-const ModelPilot = require('modelpilot');
+// ===== AFTER: Agentlify =====
+const Agentlify=require('modelpilot');
 
-const client = new ModelPilot({
-  apiKey: process.env.MODELPILOT_API_KEY, // Only change needed!
+const client=new Agentlify({
+  apiKey: process.env.AGENTLIFY_API_KEY, // Only change needed!
   routerId: 'my-smart-router' // Optional: specify router for intelligent routing
 });
 
 async function migrationExamples() {
-  console.log('🔄 OpenAI → ModelPilot Migration Examples\n');
+  console.log('🔄 OpenAI → Agentlify Migration Examples\n');
 
   // 1. Basic chat completion (IDENTICAL API)
   console.log('1. Basic Chat Completion (same API):');
-  const completion = await client.chat.create({
-    // model: 'gpt-4', // Optional with ModelPilot - intelligent routing!
+  const completion=await client.chat.create({
+    // model: 'gpt-4', // Optional with Agentlify - intelligent routing!
     messages: [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: 'Hello!' }
+      {role: 'system',content: 'You are a helpful assistant.'},
+      {role: 'user',content: 'Hello!'}
     ],
     max_tokens: 100,
     temperature: 0.7
   });
 
-  console.log('Response:', completion.choices[0].message.content);
-  console.log('✨ ModelPilot automatically selected:', completion._meta?.modelUsed);
+  console.log('Response:',completion.choices[0].message.content);
+  console.log('✨ Agentlify automatically selected:',completion._meta?.modelUsed);
   console.log();
 
   // 2. Streaming (IDENTICAL API)
   console.log('2. Streaming (same API):');
-  const stream = await client.chat.create({
-    messages: [{ role: 'user', content: 'Write a haiku about code.' }],
+  const stream=await client.chat.create({
+    messages: [{role: 'user',content: 'Write a haiku about code.'}],
     stream: true,
   });
 
   process.stdout.write('Streaming: ');
-  for await (const chunk of stream) {
-    process.stdout.write(chunk.choices[0]?.delta?.content || '');
+  for await(const chunk of stream) {
+    process.stdout.write(chunk.choices[0]?.delta?.content||'');
   }
   console.log('\n');
 
   // 3. Function calling (IDENTICAL API)
   console.log('3. Function Calling (same API):');
-  const functionCompletion = await client.chat.create({
-    messages: [{ role: 'user', content: 'What\'s the weather in Tokyo?' }],
+  const functionCompletion=await client.chat.create({
+    messages: [{role: 'user',content: 'What\'s the weather in Tokyo?'}],
     functions: [
       {
         name: 'get_weather',
@@ -103,7 +103,7 @@ async function migrationExamples() {
         parameters: {
           type: 'object',
           properties: {
-            location: { type: 'string', description: 'City name' }
+            location: {type: 'string',description: 'City name'}
           },
           required: ['location']
         }
@@ -112,30 +112,30 @@ async function migrationExamples() {
     function_call: 'auto'
   });
 
-  if (functionCompletion.choices[0].message.function_call) {
-    console.log('Function called:', functionCompletion.choices[0].message.function_call.name);
-    console.log('Arguments:', functionCompletion.choices[0].message.function_call.arguments);
+  if(functionCompletion.choices[0].message.function_call) {
+    console.log('Function called:',functionCompletion.choices[0].message.function_call.name);
+    console.log('Arguments:',functionCompletion.choices[0].message.function_call.arguments);
   }
   console.log();
 
-  // 4. ModelPilot-specific features
-  console.log('4. ModelPilot-Specific Features:');
-  
-  // Force a specific model (like OpenAI)
-  const specificModel = await client.chat.create({
-    model: 'openai:gpt-4o', // Force specific model
-    messages: [{ role: 'user', content: 'Hello from GPT-4!' }]
-  });
-  console.log('Forced model response:', specificModel.choices[0].message.content);
+  // 4. Agentlify-specific features
+  console.log('4. Agentlify-Specific Features:');
 
-  // Let ModelPilot choose the best model
-  const smartRouted = await client.chat.create({
-    // No model specified - ModelPilot chooses best model for the task
-    messages: [{ role: 'user', content: 'Analyze this complex data and provide insights.' }]
+  // Force a specific model (like OpenAI)
+  const specificModel=await client.chat.create({
+    model: 'openai:gpt-4o', // Force specific model
+    messages: [{role: 'user',content: 'Hello from GPT-4!'}]
   });
-  console.log('Smart-routed model:', smartRouted._meta?.modelUsed);
-  console.log('Selection confidence:', smartRouted._meta?.confidence);
-  console.log('Cost optimization:', smartRouted._meta?.cost);
+  console.log('Forced model response:',specificModel.choices[0].message.content);
+
+  // Let Agentlify choose the best model
+  const smartRouted=await client.chat.create({
+    // No model specified - Agentlify chooses best model for the task
+    messages: [{role: 'user',content: 'Analyze this complex data and provide insights.'}]
+  });
+  console.log('Smart-routed model:',smartRouted._meta?.modelUsed);
+  console.log('Selection confidence:',smartRouted._meta?.confidence);
+  console.log('Cost optimization:',smartRouted._meta?.cost);
   console.log();
 
   console.log('✅ Migration complete! Your OpenAI code works with minimal changes.');
@@ -146,16 +146,16 @@ async function migrationExamples() {
 console.log(`
 📋 MIGRATION CHECKLIST:
 
-1. Install ModelPilot:
+1. Install Agentlify:
    npm install modelpilot
 
 2. Replace import:
    - const OpenAI = require('openai');
-   + const ModelPilot = require('modelpilot');
+   + const Agentlify = require('modelpilot');
 
 3. Update client initialization:
    - const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-   + const client = new ModelPilot({ apiKey: process.env.MODELPILOT_API_KEY });
+   + const client = new Agentlify({ apiKey: process.env.AGENTLIFY_API_KEY });
 
 4. Update method calls:
    - openai.chat.completions.create(...)
@@ -163,7 +163,7 @@ console.log(`
 
 5. Optional: Remove model specification to enable intelligent routing
    - model: 'gpt-4'  // Remove this line
-   + // ModelPilot will choose the best model automatically
+   + // Agentlify will choose the best model automatically
 
 6. Optional: Add router configuration
    + routerId: 'my-router'  // Enable custom routing logic
@@ -171,8 +171,8 @@ console.log(`
 ✨ That's it! Your code now has intelligent model routing with the same API.
 `);
 
-if (require.main === module) {
+if(require.main===module) {
   migrationExamples().catch(console.error);
 }
 
-module.exports = migrationExamples;
+module.exports=migrationExamples;

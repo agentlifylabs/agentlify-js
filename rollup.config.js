@@ -1,10 +1,10 @@
-const resolve = require('@rollup/plugin-node-resolve');
-const commonjs = require('@rollup/plugin-commonjs');
-const terser = require('@rollup/plugin-terser');
+const resolve=require('@rollup/plugin-node-resolve');
+const commonjs=require('@rollup/plugin-commonjs');
+const terser=require('@rollup/plugin-terser');
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction=process.env.NODE_ENV==='production';
 
-module.exports = [
+module.exports=[
   // CommonJS build
   {
     input: 'src/index.js',
@@ -18,9 +18,9 @@ module.exports = [
         preferBuiltins: true
       }),
       commonjs(),
-      isProduction && terser()
+      isProduction&&terser()
     ].filter(Boolean),
-    external: ['axios', 'form-data']
+    external: ['axios','form-data']
   },
   // ES Module build
   {
@@ -34,8 +34,8 @@ module.exports = [
         preferBuiltins: true
       }),
       commonjs(),
-      isProduction && terser()
+      isProduction&&terser()
     ].filter(Boolean),
-    external: ['axios', 'form-data']
+    external: ['axios','form-data']
   }
 ];
